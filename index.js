@@ -17,7 +17,20 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect((err) => {
     const hotelsCollection = client.db(`${process.env.DB_NAME}`).collection("hotels");
 
+    app.get("/", (req, res) => {
+        res.send("hello from db");
+    });
+
     //to add hotels data
+    app.post("/addHotels", (req, res) => {
+        const hotels = req.body;
+        console.log(hotels);
+        hotelsCollection.insertMany(hotels).then((result) => {
+            res.send(result.insertedCount > 0);
+        });
+    });
+
+    //to add booking data
     app.post("/addHotels", (req, res) => {
         const hotels = req.body;
         console.log(hotels);
