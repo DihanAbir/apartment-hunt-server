@@ -6,7 +6,7 @@ const fileUpload = require("express-fileupload");
 const { ObjectID } = require("express");
 const port = 5000;
 const MongoClient = require("mongodb").MongoClient;
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.syaaq.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uefml.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 const app = express();
 app.use(bodyParser.json());
