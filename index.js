@@ -3,7 +3,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 require("dotenv").config();
 const fileUpload = require("express-fileupload");
-const { ObjectID } = require("express");
+// const { ObjectID } = require("express");
+const ObjectID = require("mongodb").ObjectID;
 const port = 5000;
 const MongoClient = require("mongodb").MongoClient;
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uefml.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
@@ -15,7 +16,7 @@ app.use(fileUpload());
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect((err) => {
-    const hotelsCollection = client.db(`${process.env.DB_NAME}`).collection("hotels");
+    const apartmentsCollection = client.db(`${process.env.DB_NAME}`).collection("apartments");
     const customerRentsCollection = client.db(`${process.env.DB_NAME}`).collection("customerRents");
     const singleRentCollection = client.db(`${process.env.DB_NAME}`).collection("singleRent");
 
@@ -26,7 +27,8 @@ client.connect((err) => {
     //to add hotels data
     app.post("/addHotels", (req, res) => {
         const hotels = req.body;
-        hotelsCollection.insertMany(hotels).then((result) => {
+        console.log(req.body);
+        apartmentsCollection.insertMany(hotels).then((result) => {
             res.send(result.insertedCount > 0);
         });
     });
@@ -34,7 +36,7 @@ client.connect((err) => {
     //to add booking data
     app.post("/addRentsInfo", (req, res) => {
         const customerRents = req.body;
-        customerRentsCollection.insertOne({ status: "Pending" }).then((result) => {
+        customerRentsCollection.insertOne({ customerRents, status: "Pending" }).then((result) => {
             res.send(result);
         });
     });
@@ -64,7 +66,7 @@ client.connect((err) => {
 
     //to show hotels data
     app.get("/showHotels", (req, res) => {
-        hotelsCollection.find({}).toArray((error, documents) => {
+        apartmentsCollection.find({}).toArray((error, documents) => {
             res.send(documents);
         });
     });
@@ -76,9 +78,16 @@ client.connect((err) => {
         });
     });
 
+    //to show customer booking data
+    app.get("/showSingleRent", (req, res) => {
+        singleRentCollection.find({}).toArray((error, documents) => {
+            res.send(documents);
+        });
+    });
+
     // to update booking status
     app.patch("/statusUpdate", (req, res) => {
-        ordersCollection
+        customerRentsCollection
             .updateOne(
                 { _id: ObjectID(req.body.id) },
                 {
